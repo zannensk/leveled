@@ -12,6 +12,16 @@ import signal
 app = flask.Flask(__name__)
 CORS(app)
 
+# Heartbeat state for auto-shutdown
+LAST_HEARTBEAT = time.time()
+HEARTBEAT_TIMEOUT = 30 # Seconds
+
+@app.route("/api/heartbeat", methods=["POST"])
+def heartbeat():
+    global LAST_HEARTBEAT
+    LAST_HEARTBEAT = time.time()
+    return jsonify({"status": "ok"}), 200
+
 @app.route("/api/ping", methods=["GET"])
 def ping():
     return jsonify({"status": "pong"}), 200
@@ -158,8 +168,24 @@ def dashboard():
         return f"Error loading dashboard: {e}", 500
 
 
+def heartbeat_watcher():
+    """Background thread that shuts down the server if no heartbeats are received."""
+    print(f" >> Auto-shutdown watcher started (Timeout: {HEARTBEAT_TIMEOUT}s)")
+    while True:
+        time.sleep(10)
+        elapsed = time.time() - LAST_HEARTBEAT
+        if elapsed > HEARTBEAT_TIMEOUT:
+            print(f"\n[!] No heartbeat for {int(elapsed)}s. Shutting down automatically...")
+            os.kill(os.getpid(), signal.SIGINT)
+            break
+
 def run_server():
     print(f" >> Flask server starting on 127.0.0.1:{SERVER_PORT}...")
+    
+    # Start the safety watcher
+    watcher = threading.Thread(target=heartbeat_watcher, daemon=True)
+    watcher.start()
+    
     app.run(host='127.0.0.1', port=SERVER_PORT, debug=False, threaded=True)
 
 

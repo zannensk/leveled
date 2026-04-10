@@ -82,15 +82,9 @@ pip install -r requirements.txt
 ```
 
 **2. Install the Chrome Extension (required for auto-tracking):**
-
-> ⚠️ **Developer Mode must remain enabled** at all times. If you disable it after loading the extension, Chrome will automatically deactivate it.
-
-Step-by-step:
-1. Open Chrome and navigate to `chrome://extensions`
-2. Toggle **Developer mode** ON (top-right corner)
-3. Click **"Load unpacked"** (top-left)
-4. In the file picker, select the `chrome_extension` folder inside this project
-5. You should see **"Task Overlay Tracker"** appear in your extension list — make sure it is **enabled** (blue toggle)
+- Open Chrome and go to `chrome://extensions`.
+- Enable **Developer Mode** (top right).
+- Click **Load unpacked** and select the `chrome_extension` folder.
 
 **3. Launch:**
 ```
@@ -135,18 +129,6 @@ Double-click start.bat
 | Close the browser tab alone | ❌ Does **not** stop the server. The backend keeps running. |
 | Close the overlay window (×) | ❌ Does **not** stop the server. Opens the Dashboard instead. |
 
-#### How the Chrome Extension Works
-
-The extension runs as a background service worker and tracks which site you are actively browsing.
-
-- Every **1 minute**, it checks which tab is active and reports the elapsed time to the local server.
-- It identifies sites by **URL keyword matching**. For each task you create in the overlay, you set a URL keyword (e.g. `leetcode` for LeetCode, `datacamp` for DataCamp).
-- When you visit a URL containing that keyword, the extension automatically attributes the time to that task.
-- If your computer is idle for **60+ seconds**, the extension pauses tracking.
-- No data ever leaves your machine — it only talks to `http://127.0.0.1:5123` (your local server).
-
-> 💡 **Tip**: The extension must be active (enabled in Chrome) AND the Leveled server must be running (`start.bat`) for time to be recorded.
-
 ---
 
 ### Core Highlights
@@ -160,8 +142,8 @@ The extension runs as a background service worker and tracks which site you are 
 ---
 
 ### Screenshots
-![Dashboard](cc1926a4-84c4-48dd-9d3d-88d6ad60964f.png)
-![Overlay](35727946-e825-4179-8e95-17e1920fb5fc.png)
+![Dashboard](Dashboard.png)
+![Overlay](Overlay.png)
 
 ---
 
@@ -253,15 +235,9 @@ pip install -r requirements.txt
 ```
 
 **2. 安装 Chrome 插件（自动计时必须）：**
-
-> ⚠️ **开发者模式必须始终保持开启状态。** 关闭后 Chrome 会自动禁用插件，计时将停止。
-
-安装步骤：
-1. 打开 Chrome，访问 `chrome://extensions`
-2. 点击右上角**「开发者模式」**开关，将其**打开**（变为蓝色）
-3. 点击左上角**「加载未打包的扩展程序」**
-4. 在文件选择器中，选择本项目的 `chrome_extension` 文件夹
-5. 确认扩展列表中出现 **「Task Overlay Tracker」**，且开关为**蓝色（已启用）**状态
+- 打开 Chrome，访问 `chrome://extensions`
+- 开启右上角「开发者模式」
+- 点击「加载已解压的扩展程序」，选择项目中的 `chrome_extension` 文件夹
 
 **3. 启动：**
 ```
@@ -306,23 +282,11 @@ pip install -r requirements.txt
 | 直接关闭浏览器标签页 | ❌ **不会**停止服务器，后台继续运行 |
 | 点击悬浮窗的 × 关闭 | ❌ **不会**停止服务器，仅关闭浮窗并打开看板 |
 
-#### Chrome 插件的工作原理
-
-插件以后台 Service Worker 的形式运行，监控你当前浏览的网站：
-
-- 每隔 **1 分钟**检查一次当前活跃标签页，并把累计时长上报给本地服务器。
-- 通过 **URL 关键词匹配**来识别网站归属。你在悬浮窗里创建任务时填写的「网站关键词」（如 `leetcode`、`datacamp`），就是这里的匹配依据。
-- 当你浏览的 URL 包含该关键词时，计时自动归属到对应任务。
-- 电脑**空闲超过 60 秒**后自动暂停计时。
-- 所有数据只发往 `http://127.0.0.1:5123`（本地服务器），绝不联网。
-
-> 💡 **提示**：插件必须处于**已启用**状态，且 Leveled 服务器正在运行（`start.bat`），计时才会被记录。
-
 ---
 
 ### 截图
-![看板](cc1926a4-84c4-48dd-9d3d-88d6ad60964f.png)
-![悬浮窗](35727946-e825-4179-8e95-17e1920fb5fc.png)
+![看板](Dashboard.png)
+![悬浮窗](Overlay.png)
 
 ---
 

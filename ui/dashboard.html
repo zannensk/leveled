@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Leveled v1.1</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --slate-50: #f8fafc;
@@ -95,6 +98,7 @@
             margin-bottom: 16px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.08);
@@ -111,6 +115,7 @@
             border: 1px solid var(--slate-200);
             transition: 0.2s;
         }
+
         .task-item:hover {
             border-color: var(--indigo-500);
             background: #fafafe;
@@ -133,6 +138,7 @@
             flex: 1;
             min-width: 0;
         }
+
         .task-name {
             font-size: 0.78rem;
             font-weight: 700;
@@ -143,12 +149,14 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .task-meta {
             font-size: 0.68rem;
             color: var(--slate-400);
             font-weight: 500;
             margin-top: 1px;
         }
+
         .task-stat {
             font-size: 0.72rem;
             font-weight: 700;
@@ -157,6 +165,7 @@
             white-space: nowrap;
             margin-left: 6px;
         }
+
         .mono {
             font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
@@ -169,6 +178,7 @@
             margin-top: 4px;
             overflow: hidden;
         }
+
         .task-bar-fill {
             height: 100%;
             border-radius: 999px;
@@ -181,6 +191,7 @@
             grid-template-columns: repeat(7, 1fr);
             gap: 8px;
         }
+
         .heat-cell {
             aspect-ratio: 1;
             border-radius: 6px;
@@ -193,16 +204,38 @@
             color: transparent;
             cursor: default;
         }
+
         .heat-cell:hover {
             transform: scale(1.2);
             color: white;
             z-index: 10;
         }
-        .heat-cell { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: bold; }
-        .lvl-1 { background: #EEF2FF; color: #6366f1; }
-        .lvl-2 { background: #C7D2FE; color: #4338ca; }
-        .lvl-3 { background: #818CF8; color: #fff; }
-        .lvl-4 { background: #4F46E5; color: #fff; }
+
+        .heat-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .lvl-1 {
+            background: #EEF2FF;
+            color: #6366f1;
+        }
+
+        .lvl-2 {
+            background: #C7D2FE;
+            color: #4338ca;
+        }
+
+        .lvl-3 {
+            background: #818CF8;
+            color: #fff;
+        }
+
+        .lvl-4 {
+            background: #4F46E5;
+            color: #fff;
+        }
 
         .dashboard-main {
             display: grid;
@@ -245,14 +278,16 @@
             overflow-y: auto;
             padding-right: 8px;
         }
-        
+
         .ability-grid::-webkit-scrollbar {
             width: 6px;
         }
+
         .ability-grid::-webkit-scrollbar-thumb {
             background: var(--slate-200);
             border-radius: 10px;
         }
+
         .ability-grid::-webkit-scrollbar-thumb:hover {
             background: var(--slate-300);
         }
@@ -262,7 +297,7 @@
             padding: 20px;
             border-radius: 20px;
             border: 1px solid var(--slate-100);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
         }
 
         .lang-btn {
@@ -278,51 +313,77 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
-        .lang-btn:hover { 
+
+        .lang-btn:hover {
             background: var(--slate-100);
             transform: translateY(-1px);
         }
+
         .stop-btn {
             cursor: pointer;
-            padding: 8px 16px;
-            background: white;
-            border: 1px solid #fecaca;
+            padding: 8px 18px;
+            background: #ef4444;
+            border: none;
             border-radius: 24px;
             font-size: 0.85rem;
-            font-weight: 600;
-            color: #dc2626;
-            transition: 0.2s;
+            font-weight: 700;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 1px 2px rgba(220,38,38,0.08);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+            animation: pulse-red 2.5s infinite;
         }
+
         .stop-btn:hover {
-            background: #fef2f2;
-            border-color: #dc2626;
-            transform: translateY(-1px);
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+            animation: none;
         }
+
+        .stop-btn i {
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
         #shutdown-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(15,23,42,0.7);
+            background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(8px);
             z-index: 9999;
             align-items: center;
             justify-content: center;
         }
+
         #shutdown-overlay.visible {
             display: flex;
         }
+
         #shutdown-box {
             background: white;
             border-radius: 24px;
             padding: 40px 48px;
             text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -342,13 +403,16 @@
         <div class="logo-area">
             <div class="logo-icon"><i data-lucide="rocket" size="24"></i></div>
             <div>
-               <h1 style="color: var(--slate-900); margin:0; font-size: 1.5rem; letter-spacing: -0.04em; font-weight: 900; display: flex; align-items: center; gap: 8px;">
-                   <span id="t-header">Leveled</span>
-               </h1>
-               <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate-400); font-weight: 800;">Premium v2.0</span>
+                <h1
+                    style="color: var(--slate-900); margin:0; font-size: 1.5rem; letter-spacing: -0.04em; font-weight: 900; display: flex; align-items: center; gap: 8px;">
+                    <span id="t-header">Leveled</span>
+                </h1>
+                <span
+                    style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate-400); font-weight: 800;">Premium
+                    v2.0</span>
             </div>
         </div>
-        
+
 
 
         <button class="lang-btn" onclick="toggleLang()" id="lang-btn">
@@ -363,14 +427,17 @@
         <!-- Left: Tasks & Heatmap -->
         <div class="side-panel" style="display: flex; flex-direction: column;">
             <div class="card" style="margin-bottom: 12px;">
-                <h2 class="section-title"><i data-lucide="target" style="color: var(--blue-500)"></i> <span id="t-tasks-title">Active Progress</span></h2>
+                <h2 class="section-title"><i data-lucide="target" style="color: var(--blue-500)"></i> <span
+                        id="t-tasks-title">Active Progress</span></h2>
                 <div id="task-list">Loading...</div>
             </div>
 
             <div class="card" style="margin-bottom: 0;">
-                <h2 class="section-title"><i data-lucide="calendar" style="color: var(--indigo-500)"></i> <span id="t-cal-title">Consistency</span></h2>
+                <h2 class="section-title"><i data-lucide="calendar" style="color: var(--indigo-500)"></i> <span
+                        id="t-cal-title">Consistency</span></h2>
                 <div id="calendar-container" class="heatmap-grid"></div>
-                <p style="font-size:0.75rem; color: var(--slate-400); margin-top: 24px; text-align: center; font-style: italic; font-weight: 500;" id="t-cal-sub">Goal: 3+ Daily</p>
+                <p style="font-size:0.75rem; color: var(--slate-400); margin-top: 24px; text-align: center; font-style: italic; font-weight: 500;"
+                    id="t-cal-sub">Goal: 3+ Daily</p>
             </div>
         </div>
 
@@ -379,21 +446,24 @@
             <!-- Top Row: Radar & Skills -->
             <div class="hero-row">
                 <div class="card" style="margin-bottom: 0; padding: 24px;">
-                    <h2 class="section-title"><i data-lucide="brain" style="color: var(--indigo-500)"></i> <span id="t-radar-title">Ability Vector</span></h2>
+                    <h2 class="section-title"><i data-lucide="brain" style="color: var(--indigo-500)"></i> <span
+                            id="t-radar-title">Ability Vector</span></h2>
                     <div id="radar-box" style="height: 380px;">
                         <canvas id="radarChart" style="max-height: 100%;"></canvas>
                     </div>
                 </div>
 
                 <div class="card" style="margin-bottom: 0; padding: 24px;">
-                    <h2 class="section-title"><i data-lucide="layout-grid" style="color: var(--indigo-500)"></i> Core Skillsets</h2>
+                    <h2 class="section-title"><i data-lucide="layout-grid" style="color: var(--indigo-500)"></i> Core
+                        Skillsets</h2>
                     <div class="ability-grid" id="ability-grid">Loading...</div>
                 </div>
             </div>
 
             <!-- Bottom Row: History Chart -->
             <div class="card" style="margin-bottom: 0;">
-                <h2 class="section-title"><i data-lucide="trending-up" style="color: var(--indigo-500)"></i> <span id="t-history-title">Growth Trajectory</span></h2>
+                <h2 class="section-title"><i data-lucide="trending-up" style="color: var(--indigo-500)"></i> <span
+                        id="t-history-title">Growth Trajectory</span></h2>
                 <div style="position: relative; height: 260px; width: 100%;">
                     <canvas id="lineChart"></canvas>
                 </div>
@@ -437,7 +507,7 @@
         const KNOWN_ICONS = { "Math": "📐", "Algorithm": "🧩", "Coding": "💻", "Project": "🚀", "Language": "🗣️", "General": "🎯" };
         const FALLBACK_COLORS = ["#FF6384", "#36A2EB", "#4BC0C0", "#9966FF", "#FF9F40", "#F59E0B", "#10B981", "#E53E3E", "#3182CE"];
         let colorMap = {};
-        
+
         function getColor(dim, index) {
             if (colorMap[dim]) return colorMap[dim];
             colorMap[dim] = FALLBACK_COLORS[index % FALLBACK_COLORS.length];
@@ -505,7 +575,7 @@
 
                 const histRes = await fetch(`${SERVER}/history`);
                 renderHistory(await histRes.json(), activeDims);
-                
+
                 lucide.createIcons();
             } catch (e) { console.error(e); }
         }
@@ -536,7 +606,7 @@
                                     ${dim} • ${t.weight} ${task.weight} • <span class="mono">${task.today_mins}/${task.goal_min}m</span>
                                     <span style="float:right;">
                                         ${(task.streak_count > 0) ? `<span style="color:#ff9800">\ud83d\udd25 +${task.streak_count}</span>` :
-                                            (task.streak_count < 0) ? `<span style="color:#2196f3">\u2744\ufe0f ${task.streak_count}</span>` :
+                            (task.streak_count < 0) ? `<span style="color:#2196f3">\u2744\ufe0f ${task.streak_count}</span>` :
                                 `⚪ 0`}
                                     </span>
                                 </div>
@@ -585,9 +655,9 @@
                         }]
                     },
                     options: {
-                        scales: { 
-                            r: { 
-                                beginAtZero: true, 
+                        scales: {
+                            r: {
+                                beginAtZero: true,
                                 suggestedMax: scaleMax,
                                 grid: { color: 'rgba(0,0,0,0.08)', lineWidth: 1 },
                                 angleLines: { color: 'rgba(0,0,0,0.1)', lineWidth: 1.5 },
@@ -596,7 +666,7 @@
                                     font: { size: 14, weight: '700' },
                                     color: '#1E293B'
                                 }
-                            } 
+                            }
                         },
                         plugins: { legend: { display: false } }
                     }
@@ -698,8 +768,8 @@
                                 grid: { display: false },
                                 ticks: { font: { size: 11 }, maxTicksLimit: 14 }
                             },
-                            y: { 
-                                title: { display: true, text: 'Minutes' }, 
+                            y: {
+                                title: { display: true, text: 'Minutes' },
                                 beginAtZero: true,
                                 grid: { color: 'rgba(0,0,0,0.05)' }
                             }
@@ -711,15 +781,21 @@
             }
         }
 
+        // Heartbeat to keep server alive
+        setInterval(() => {
+            fetch(`${SERVER}/api/heartbeat`, { method: 'POST' }).catch(() => { });
+        }, 5000);
+
         loadData();
 
         async function stopServer() {
             if (!confirm("Stop the Leveled server? You will need to run start.bat again to restart.")) return;
             try {
                 await fetch(`${SERVER}/api/shutdown`, { method: 'POST' });
-            } catch(e) { /* expected - server is shutting down */ }
+            } catch (e) { /* expected - server is shutting down */ }
             document.getElementById('shutdown-overlay').classList.add('visible');
         }
     </script>
 </body>
+
 </html>

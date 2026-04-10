@@ -196,6 +196,9 @@ class TaskOverlay:
         
     def fetch_and_update(self):
         try:
+            # Heartbeat to keep server alive
+            requests.post(f"{SERVER_BASE}/api/heartbeat", timeout=1)
+            
             resp = requests.get(f"{SERVER_BASE}/progress", timeout=1)
             data = resp.json() # [{id, name, seconds, goal_min, [dimension?]}, ...]
             self.root.after(0, lambda: self.refresh_ui(data))
