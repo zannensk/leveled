@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Leveled v1.1</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --blue-500: #3b82f6;
+            --blue-600: #2563eb;
+            --indigo-500: #6366f1;
+            --indigo-600: #4f46e5;
+            --emerald-500: #10b981;
+            --emerald-600: #059669;
+            --amber-500: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            padding: 40px 20px;
+            background: var(--slate-50);
+            color: var(--slate-800);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        header {
+            max-width: 1200px;
+            margin: 0 auto 40px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-icon {
+            padding: 10px;
+            border-radius: 16px;
+            background: linear-gradient(to bottom right, #6366f1, #9333ea);
+            color: white;
+            display: flex;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 360px 1fr;
+            }
+        }
+
+        .section-title {
+            margin-top: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--slate-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 18px 20px;
+            border-radius: 24px;
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            margin-bottom: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Task Items */
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 7px 10px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            background: white;
+            border: 1px solid var(--slate-200);
+            transition: 0.2s;
+        }
+        .task-item:hover {
+            border-color: var(--indigo-500);
+            background: #fafafe;
+        }
+
+        .task-icon {
+            margin-right: 8px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.06);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .task-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .task-name {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--slate-800);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .task-meta {
+            font-size: 0.68rem;
+            color: var(--slate-400);
+            font-weight: 500;
+            margin-top: 1px;
+        }
+        .task-stat {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--slate-600);
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+            margin-left: 6px;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        .task-bar-bg {
+            background: var(--slate-100);
+            height: 3px;
+            border-radius: 999px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+        .task-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Heatmap */
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .heat-cell {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            background: var(--slate-100);
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            color: transparent;
+            cursor: default;
+        }
+        .heat-cell:hover {
+            transform: scale(1.2);
+            color: white;
+            z-index: 10;
+        }
+        .heat-cell { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: bold; }
+        .lvl-1 { background: #EEF2FF; color: #6366f1; }
+        .lvl-2 { background: #C7D2FE; color: #4338ca; }
+        .lvl-3 { background: #818CF8; color: #fff; }
+        .lvl-4 { background: #4F46E5; color: #fff; }
+
+        .dashboard-main {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-main {
+                grid-template-columns: 360px 1fr;
+            }
+        }
+
+        .hero-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        @media (min-width: 800px) {
+            .hero-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        #radar-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .ability-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        .ability-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+        .ability-grid::-webkit-scrollbar-thumb {
+            background: var(--slate-200);
+            border-radius: 10px;
+        }
+        .ability-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--slate-300);
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--slate-100);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            padding: 8px 20px;
+            background: white;
+            border: 1px solid var(--slate-200);
+            border-radius: 24px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--slate-600);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .lang-btn:hover { 
+            background: var(--slate-100);
+            transform: translateY(-1px);
+        }
+        .stop-btn {
+            cursor: pointer;
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #fecaca;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #dc2626;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 2px rgba(220,38,38,0.08);
+        }
+        .stop-btn:hover {
+            background: #fef2f2;
+            border-color: #dc2626;
+            transform: translateY(-1px);
+        }
+        #shutdown-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        #shutdown-overlay.visible {
+            display: flex;
+        }
+        #shutdown-box {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 48px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Shutdown Overlay -->
+    <div id="shutdown-overlay">
+        <div id="shutdown-box">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">🛑</div>
+            <h2 style="margin:0 0 8px; color: var(--slate-900);">Server Stopped</h2>
+            <p style="color: var(--slate-500); margin: 0;">You can close this tab now.</p>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon"><i data-lucide="rocket" size="24"></i></div>
+            <div>
+               <h1 style="color: var(--slate-900); margin:0; font-size: 1.5rem; letter-spacing: -0.04em; font-weight: 900; display: flex; align-items: center; gap: 8px;">
+                   <span id="t-header">Leveled</span>
+               </h1>
+               <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate-400); font-weight: 800;">Premium v2.0</span>
+            </div>
+        </div>
+        
+
+
+        <button class="lang-btn" onclick="toggleLang()" id="lang-btn">
+            <i data-lucide="languages" size="18"></i> 中 / EN
+        </button>
+        <button class="stop-btn" onclick="stopServer()">
+            <i data-lucide="power" size="16"></i> Stop
+        </button>
+    </header>
+
+    <div class="dashboard-main">
+        <!-- Left: Tasks & Heatmap -->
+        <div class="side-panel" style="display: flex; flex-direction: column;">
+            <div class="card" style="margin-bottom: 12px;">
+                <h2 class="section-title"><i data-lucide="target" style="color: var(--blue-500)"></i> <span id="t-tasks-title">Active Progress</span></h2>
+                <div id="task-list">Loading...</div>
+            </div>
+
+            <div class="card" style="margin-bottom: 0;">
+                <h2 class="section-title"><i data-lucide="calendar" style="color: var(--indigo-500)"></i> <span id="t-cal-title">Consistency</span></h2>
+                <div id="calendar-container" class="heatmap-grid"></div>
+                <p style="font-size:0.75rem; color: var(--slate-400); margin-top: 24px; text-align: center; font-style: italic; font-weight: 500;" id="t-cal-sub">Goal: 3+ Daily</p>
+            </div>
+        </div>
+
+        <!-- Right: Main Content -->
+        <div class="ability-container" style="display: flex; flex-direction: column; gap: 32px;">
+            <!-- Top Row: Radar & Skills -->
+            <div class="hero-row">
+                <div class="card" style="margin-bottom: 0; padding: 24px;">
+                    <h2 class="section-title"><i data-lucide="brain" style="color: var(--indigo-500)"></i> <span id="t-radar-title">Ability Vector</span></h2>
+                    <div id="radar-box" style="height: 380px;">
+                        <canvas id="radarChart" style="max-height: 100%;"></canvas>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 0; padding: 24px;">
+                    <h2 class="section-title"><i data-lucide="layout-grid" style="color: var(--indigo-500)"></i> Core Skillsets</h2>
+                    <div class="ability-grid" id="ability-grid">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: History Chart -->
+            <div class="card" style="margin-bottom: 0;">
+                <h2 class="section-title"><i data-lucide="trending-up" style="color: var(--indigo-500)"></i> <span id="t-history-title">Growth Trajectory</span></h2>
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SERVER = "http://127.0.0.1:5123";
+        let lang = localStorage.getItem("leveled_lang") || "en";
+
+        const TEXTS = {
+            "en": {
+                header: "🚀 Leveled",
+                tasksTitle: "📝 Active Tasks",
+                calTitle: "📅 Consistency",
+                calSub: "(Goal: 3+ Tasks/Day)",
+                radarTitle: "🧬 Ability Vector (Aggregated)",
+                historyTitle: "📈 Growth History",
+                weight: "Weight",
+                toNext: "to Next",
+                phase: "Phase",
+                total: "Total",
+                noTasks: "No tasks configured."
+            },
+            "zh": {
+                header: "🚀 升级没 (Leveled)",
+                tasksTitle: "📝 当前任务进度",
+                calTitle: "📅 连续性打卡",
+                calSub: "(目标: 每日 3+ 任务)",
+                radarTitle: "🧬 核心能力雷达图",
+                historyTitle: "📈 历史成长折线图",
+                weight: "权重",
+                toNext: "距离下一阶段",
+                phase: "阶段",
+                total: "总计",
+                noTasks: "目前没有追踪任何任务。"
+            }
+        };
+
+        const KNOWN_ICONS = { "Math": "📐", "Algorithm": "🧩", "Coding": "💻", "Project": "🚀", "Language": "🗣️", "General": "🎯" };
+        const FALLBACK_COLORS = ["#FF6384", "#36A2EB", "#4BC0C0", "#9966FF", "#FF9F40", "#F59E0B", "#10B981", "#E53E3E", "#3182CE"];
+        let colorMap = {};
+        
+        function getColor(dim, index) {
+            if (colorMap[dim]) return colorMap[dim];
+            colorMap[dim] = FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+            return colorMap[dim];
+        }
+
+        function getIcon(dim) {
+            return KNOWN_ICONS[dim] || "🧠";
+        }
+
+        function updateLangTexts() {
+            const t = TEXTS[lang];
+            document.getElementById("t-header").innerText = t.header;
+            document.getElementById("t-tasks-title").innerText = t.tasksTitle;
+            document.getElementById("t-cal-title").innerText = t.calTitle;
+            document.getElementById("t-cal-sub").innerText = t.calSub;
+            document.getElementById("t-radar-title").innerText = t.radarTitle;
+            document.getElementById("t-history-title").innerText = t.historyTitle;
+        }
+
+        function toggleLang() {
+            lang = lang === "en" ? "zh" : "en";
+            localStorage.setItem("leveled_lang", lang);
+            updateLangTexts();
+            loadData(); // Re-render
+            lucide.createIcons();
+        }
+
+        async function deleteDimension(dim, numTasks) {
+            let confirmMsg = `Confirm delete skillset "${dim}"?`;
+            let forceStr = "";
+            if (numTasks > 0) {
+                confirmMsg = `⚠️ WARNING: Skillset "${dim}" contains ${numTasks} active tasks!\n\nDeleting this skillset will ALSO PERMANENTLY DELETE ALL ITS TASKS and their history!\n\nAre you absolutely sure you want to proceed?`;
+                forceStr = "?force=1";
+            }
+            if (!confirm(confirmMsg)) return;
+            try {
+                // Use encodeURIComponent to handle spaces/special characters
+                const res = await fetch(`${SERVER}/dimensions/${encodeURIComponent(dim)}${forceStr}`, { method: 'DELETE' });
+                if (res.ok) {
+                    loadData();
+                } else {
+                    const err = await res.json();
+                    alert(err.error || "Failed to delete");
+                }
+            } catch (e) {
+                console.error("Delete failed:", e);
+                alert("Server connection lost or error occurred.");
+            }
+        }
+
+
+        async function loadData() {
+            updateLangTexts();
+            try {
+                const stateRes = await fetch(`${SERVER}/ability_state`);
+                const stateData = await stateRes.json();
+                const activeDims = Object.keys(stateData);
+
+                renderTasks(stateData, activeDims);
+                renderAbilityPanel(stateData, activeDims);
+
+                const calRes = await fetch(`${SERVER}/calendar`);
+                renderCalendar(await calRes.json());
+
+                const histRes = await fetch(`${SERVER}/history`);
+                renderHistory(await histRes.json(), activeDims);
+                
+                lucide.createIcons();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderTasks(data, activeDims) {
+            const t = TEXTS[lang];
+            let html = "";
+            let dimIdx = 0;
+            activeDims.forEach(dim => {
+                const dimData = data[dim];
+                if (!dimData || !dimData.tasks) return;
+                const dimColor = getColor(dim, dimIdx++);
+
+                dimData.tasks.forEach(task => {
+                    const pct = Math.min(100, (task.today_mins / task.goal_min) * 100);
+                    const isDone = task.today_mins >= task.goal_min;
+                    const c = isDone ? "var(--emerald-500)" : dimColor;
+
+                    html += `
+                        <div class="task-item">
+                            <div class="task-icon">${getIcon(dim)}</div>
+                            <div class="task-info">
+                                <div class="task-header">
+                                    <span class="task-name">${task.name}</span>
+                                    <span class="lvl-badge">Lv.${task.level}</span>
+                                </div>
+                                <div class="task-meta">
+                                    ${dim} • ${t.weight} ${task.weight} • <span class="mono">${task.today_mins}/${task.goal_min}m</span>
+                                    <span style="float:right;">
+                                        ${(task.streak_count > 0) ? `<span style="color:#ff9800">\ud83d\udd25 +${task.streak_count}</span>` :
+                                            (task.streak_count < 0) ? `<span style="color:#2196f3">\u2744\ufe0f ${task.streak_count}</span>` :
+                                `⚪ 0`}
+                                    </span>
+                                </div>
+                                <div class="task-bar-bg">
+                                    <div class="task-bar-fill" style="width: ${pct}%; background: ${c}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            document.getElementById("task-list").innerHTML = html || `<p style='padding:10px; color:#999'>${t.noTasks}</p>`;
+        }
+
+        function renderAbilityPanel(data, activeDims) {
+            const t = TEXTS[lang];
+            const levels = activeDims.map(d => data[d] ? data[d].chart_level : 1);
+            const bgColors = activeDims.map((d, i) => getColor(d, i));
+
+            const ctx = document.getElementById("radarChart").getContext('2d');
+            if (window.myRadar) window.myRadar.destroy();
+
+            const maxLvl = Math.max(...levels, 1);
+            let scaleMax = 10;
+            if (maxLvl > 10) scaleMax = 25;
+            if (maxLvl > 25) scaleMax = 50;
+            if (maxLvl > 50) scaleMax = 100;
+
+            try {
+                window.myRadar = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: activeDims,
+                        datasets: [{
+                            label: t.phase,
+                            data: levels,
+                            backgroundColor: 'rgba(99, 102, 241, 0.25)',
+                            borderColor: '#4F46E5',
+                            borderWidth: 3,
+                            fill: true,
+                            pointBackgroundColor: bgColors,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 3,
+                            pointRadius: 8,
+                            pointHoverRadius: 10
+                        }]
+                    },
+                    options: {
+                        scales: { 
+                            r: { 
+                                beginAtZero: true, 
+                                suggestedMax: scaleMax,
+                                grid: { color: 'rgba(0,0,0,0.08)', lineWidth: 1 },
+                                angleLines: { color: 'rgba(0,0,0,0.1)', lineWidth: 1.5 },
+                                ticks: { display: false },
+                                pointLabels: {
+                                    font: { size: 14, weight: '700' },
+                                    color: '#1E293B'
+                                }
+                            } 
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            } catch (e) {
+                console.error("Radar chart rendering failed:", e);
+            }
+
+            let html = "";
+            let dimIdx = 0;
+            activeDims.forEach(dim => {
+                const d = data[dim];
+                if (!d) return;
+                const color = getColor(dim, dimIdx++);
+                const target = d.phase_cost || 30;
+                const mins = d.phase_progress || 0;
+                const pct = Math.min(100, (mins / target) * 100);
+
+                html += `
+                    <div class="stat-card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: transparent;">
+                        <div style="display: flex; items-center; gap: 12px;">
+                            <div style="width: 8px; height: 32px; border-radius: 4px; background: ${color};"></div>
+                            <div>
+                                <div style="font-size:0.9rem; font-weight: 700; color: var(--slate-800);">${dim}</div>
+                                <div class="mono" style="font-size:0.65rem; color: var(--slate-400); margin-top: 2px;">Total: ${d.total_accumulated}m</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size:0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--indigo-500); margin-bottom: 2px;">Phase ${d.level}</div>
+                            <div class="mono" style="font-size: 0.8rem; font-weight: 700; color: var(--slate-600);">${mins}/${target}m</div>
+                            <button onclick="deleteDimension('${dim}', ${d.tasks.length})" style="background:none; border:none; color:var(--rose-500); cursor:pointer; font-size:0.7rem; font-weight:bold; padding:0; margin-top:2px;">[DELETE]</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById("ability-grid").innerHTML = html;
+        }
+
+        function renderCalendar(data) {
+            const container = document.getElementById("calendar-container");
+            container.innerHTML = "";
+            const now = new Date();
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement("div");
+                dayDiv.className = "heat-cell";
+                dayDiv.innerText = i;
+
+                const monthStr = (now.getMonth() + 1).toString().padStart(2, '0');
+                const dayStr = i.toString().padStart(2, '0');
+                const key = `${now.getFullYear()}-${monthStr}-${dayStr}`;
+
+                if (data[key]) {
+                    // Logic for intensity based on daily achievement
+                    const val = data[key]; // string like "star" or "partial"
+                    if (val === "star") dayDiv.classList.add("lvl-4");
+                    else dayDiv.classList.add("lvl-2");
+                }
+                container.appendChild(dayDiv);
+            }
+        }
+
+        function renderHistory(data, activeDims) {
+            if (!data || !data.length) return;
+            const labels = data.map(d => d.date);
+            const datasets = activeDims.map((dim, i) => {
+                const color = getColor(dim, i);
+                return {
+                    label: dim,
+                    data: data.map(d => (d[dim] || 0) / 60),
+                    borderColor: color,
+                    tension: 0.1,
+                    fill: false,
+                    pointRadius: 4,
+                    pointBackgroundColor: color,
+                    pointHoverRadius: 6
+                };
+            });
+
+            if (window.myLine) window.myLine.destroy();
+            try {
+                window.myLine = new Chart(document.getElementById("lineChart"), {
+                    type: 'line',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: { boxWidth: 12, padding: 16, font: { size: 11 } }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { size: 11 }, maxTicksLimit: 14 }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Minutes' }, 
+                                beginAtZero: true,
+                                grid: { color: 'rgba(0,0,0,0.05)' }
+                            }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Line chart rendering failed:", e);
+            }
+        }
+
+        loadData();
+
+        async function stopServer() {
+            if (!confirm("Stop the Leveled server? You will need to run start.bat again to restart.")) return;
+            try {
+                await fetch(`${SERVER}/api/shutdown`, { method: 'POST' });
+            } catch(e) { /* expected - server is shutting down */ }
+            document.getElementById('shutdown-overlay').classList.add('visible');
+        }
+    </script>
+</body>
+</html>

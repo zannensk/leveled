@@ -1,0 +1,18 @@
+[project]
+name = "leveled"
+version = "1.0.0"
+description = "A lightweight always-on-top desktop task overlay for focused daily learning and progress tracking."
+authors = [
+    { name = "Author" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "Flask>=3.0.0",
+    "flask-cors>=4.0.0",
+    "requests>=2.31.0"
+]
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
