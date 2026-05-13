@@ -97,9 +97,9 @@ async function postUpdate(site, seconds) {
     } catch (e) { }
 }
 
-async function flushTime() {
+async function flushTime(force = false) {
     await ensureStateLoaded();
-    if (runtimeState.currentSite && !runtimeState.isIdle) {
+    if (runtimeState.currentSite && (!runtimeState.isIdle || force)) {
         const now = Date.now();
         const elapsedSecs = Math.max(0, Math.floor((now - runtimeState.lastTickTime) / 1000));
         if (elapsedSecs > 0) {
@@ -169,9 +169,33 @@ chrome.runtime.onStartup.addListener(() => {
 chrome.alarms.onAlarm.addListener(async (alarm) => {
     await ensureStateLoaded();
     if (alarm.name === "tick") {
-        if (runtimeState.isIdle) return;
+        let isVideoPlaying = false;
+        
+        if (runtimeState.isIdle && runtimeState.currentSite) {
+            try {
+                const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+                if (tab) {
+                    const results = await chrome.scripting.executeScript({
+                        target: { tabId: tab.id },
+                        func: () => {
+                            const videos = document.querySelectorAll('video');
+                            for (let v of videos) {
+                                if (!v.paused && !v.ended && v.readyState > 2) return true;
+                            }
+                            return false;
+                        }
+                    });
+                    if (results && results[0] && results[0].result === true) {
+                        isVideoPlaying = true;
+                    }
+                }
+            } catch(e) {}
+        }
+
+        if (runtimeState.isIdle && !isVideoPlaying) return;
+        
         // Don't wait for tab change, just flush the accumulated time
-        await flushTime();
+        await flushTime(isVideoPlaying);
         // After flushing, re-ping if still on site
         await refreshActiveTabSite();
     } else if (alarm.name === "config") {

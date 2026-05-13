@@ -245,14 +245,13 @@ class TaskOverlay:
             anchor="w",
         )
         msg.pack(fill="x", padx=4, pady=10)
-            
+
     def toggle_expand(self, event):
         self.is_expanded = not self.is_expanded
         self.last_signature = None # Force refresh
         self.fetch_and_update() # Re-render
 
     def refresh_ui(self, tasks):
-        # 1. Sort: Incomplete first, then by name
         enriched = []
         for t in tasks:
             mins = int(t['seconds'] / 60)
@@ -260,7 +259,23 @@ class TaskOverlay:
             is_done = mins >= goal
             enriched.append({**t, "mins": mins, "is_done": is_done})
             
-        enriched.sort(key=lambda x: (x['is_done'], x['name']))
+        def get_priority(x):
+            # Priority 0: Active tasks (always at top)
+            # Priority 1: Incomplete tasks
+            # Priority 2: Completed tasks
+            if x.get('active'):
+                return 0
+            elif x.get('is_done'):
+                return 2
+            else:
+                return 1
+
+        enriched.sort(key=lambda x: (get_priority(x), str(x.get('name', '')).lower()))
+        
+        # DEBUG LOGGING
+        from utils.runtime_log import log
+        debug_info = [(t['name'], t.get('active'), t.get('is_done'), get_priority(t)) for t in enriched]
+        log(f"Overlay sorted tasks: {debug_info}")
         
         # 2. Slice
         total_count = len(enriched)
